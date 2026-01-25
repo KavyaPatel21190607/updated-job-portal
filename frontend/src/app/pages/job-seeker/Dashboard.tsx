@@ -65,7 +65,7 @@ export function JobSeekerDashboard() {
             <Send className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">{stats.total || 0}</div>
+            <div className="text-2xl">{(stats.total || 0).toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               All applications
             </p>
@@ -78,7 +78,7 @@ export function JobSeekerDashboard() {
             <Eye className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">{(stats.viewed || 0) + (stats.shortlisted || 0)}</div>
+            <div className="text-2xl">{((stats.viewed || 0) + (stats.shortlisted || 0)).toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               Being reviewed
             </p>
@@ -91,7 +91,7 @@ export function JobSeekerDashboard() {
             <Clock className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">{stats.interview || 0}</div>
+            <div className="text-2xl">{(stats.interview || 0).toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               Scheduled
             </p>
@@ -104,7 +104,7 @@ export function JobSeekerDashboard() {
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">{stats.hired || 0}</div>
+            <div className="text-2xl">{(stats.hired || 0).toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               {(stats.hired || 0) > 0 ? 'Congratulations!' : 'Keep going!'}
             </p>
@@ -166,8 +166,8 @@ export function JobSeekerDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentApplications && recentApplications.length > 0 ? (
-                recentApplications.map((app: any) => {
+              {recentApplications && recentApplications.filter(app => app.job).length > 0 ? (
+                recentApplications.filter(app => app.job).map((app: any) => {
                   const statusColors: Record<string, string> = {
                     pending: 'bg-gray-100 text-gray-800',
                     viewed: 'bg-blue-100 text-blue-800',

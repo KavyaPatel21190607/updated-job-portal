@@ -77,7 +77,7 @@ export function EmployerDashboard() {
             <Briefcase className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">{activeJobs}</div>
+            <div className="text-2xl">{activeJobs.toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               Currently active
             </p>
@@ -90,7 +90,7 @@ export function EmployerDashboard() {
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">{totalApplications}</div>
+            <div className="text-2xl">{totalApplications.toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               All time applications
             </p>
@@ -103,7 +103,7 @@ export function EmployerDashboard() {
             <Eye className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">{stats.pending || 0}</div>
+            <div className="text-2xl">{(stats.pending || 0).toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               Pending review
             </p>
@@ -116,7 +116,7 @@ export function EmployerDashboard() {
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">{stats.hired || 0}</div>
+            <div className="text-2xl">{(stats.hired || 0).toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               Successfully hired
             </p>
@@ -132,27 +132,27 @@ export function EmployerDashboard() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-500">{stats.pending || 0}</p>
+              <p className="text-2xl font-bold text-gray-500">{(stats.pending || 0).toLocaleString('en-IN')}</p>
               <p className="text-sm text-gray-600">Pending</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-blue-500">{stats.viewed || 0}</p>
+              <p className="text-2xl font-bold text-blue-500">{(stats.viewed || 0).toLocaleString('en-IN')}</p>
               <p className="text-sm text-gray-600">Viewed</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-yellow-500">{stats.shortlisted || 0}</p>
+              <p className="text-2xl font-bold text-yellow-500">{(stats.shortlisted || 0).toLocaleString('en-IN')}</p>
               <p className="text-sm text-gray-600">Shortlisted</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-purple-500">{stats.interview || 0}</p>
+              <p className="text-2xl font-bold text-purple-500">{(stats.interview || 0).toLocaleString('en-IN')}</p>
               <p className="text-sm text-gray-600">Interview</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-green-500">{stats.hired || 0}</p>
+              <p className="text-2xl font-bold text-green-500">{(stats.hired || 0).toLocaleString('en-IN')}</p>
               <p className="text-sm text-gray-600">Hired</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-red-500">{stats.rejected || 0}</p>
+              <p className="text-2xl font-bold text-red-500">{(stats.rejected || 0).toLocaleString('en-IN')}</p>
               <p className="text-sm text-gray-600">Rejected</p>
             </div>
           </div>
@@ -179,7 +179,7 @@ export function EmployerDashboard() {
                       <p className={`text-sm ${
                         app.atsScore >= 85 ? 'text-green-600' : app.atsScore >= 70 ? 'text-yellow-600' : 'text-red-600'
                       }`}>
-                        {app.atsScore}/100
+                        {app.atsScore.toLocaleString('en-IN')}/100
                       </p>
                     </div>
                     <p className="text-sm text-gray-500 w-24">

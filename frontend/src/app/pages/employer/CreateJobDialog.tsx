@@ -39,7 +39,7 @@ export function CreateJobDialog({ open, onOpenChange, onSuccess, editJob }: Crea
         salaryRange: {
           min: parseInt(formData.get('salaryMin') as string),
           max: parseInt(formData.get('salaryMax') as string),
-          currency: 'USD'
+          currency: 'INR'
         },
         benefits: (formData.get('benefits') as string).split(',').map(b => b.trim()).filter(b => b),
       };
