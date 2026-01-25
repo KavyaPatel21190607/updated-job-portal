@@ -7,6 +7,7 @@ import { OAuthCallback } from '@/app/pages/auth/OAuthCallback';
 // Job Seeker Pages
 import { JobSeekerDashboard } from '@/app/pages/job-seeker/Dashboard';
 import { JobSearch } from '@/app/pages/job-seeker/JobSearch';
+import { JobDetails } from '@/app/pages/job-seeker/JobDetails';
 import { MyApplications } from '@/app/pages/job-seeker/MyApplications';
 import { ResumeBuilder } from '@/app/pages/job-seeker/ResumeBuilder';
 import { JobSeekerMessages } from '@/app/pages/job-seeker/Messages';
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/job-seeker/dashboard" replace /> },
       { path: 'dashboard', Component: JobSeekerDashboard },
       { path: 'jobs', Component: JobSearch },
+      { path: 'jobs/:jobId', Component: JobDetails },
       { path: 'applications', Component: MyApplications },
       { path: 'resume', Component: ResumeBuilder },
       { path: 'messages', Component: JobSeekerMessages },

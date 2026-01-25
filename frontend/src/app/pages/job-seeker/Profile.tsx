@@ -160,11 +160,11 @@ export function JobSeekerProfile() {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
-              <Input id="phone" name="phone" defaultValue={profile?.phone} placeholder="+1 (555) 123-4567" />
+              <Input id="phone" name="phone" defaultValue={profile?.phone} placeholder="Your Phone number" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
-              <Input id="location" name="location" defaultValue={profile?.location} placeholder="San Francisco, CA" />
+              <Input id="location" name="location" defaultValue={profile?.location} placeholder="Your Location" />
             </div>
           </div>
           <div className="space-y-2">
