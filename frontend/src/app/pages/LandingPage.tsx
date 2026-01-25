@@ -41,7 +41,7 @@ export function LandingPage() {
               </Button>
             </Link>
             <Link to="/login">
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 w-full sm:w-auto">
+              <Button size="lg" variant="outline">
                 Sign In
               </Button>
             </Link>

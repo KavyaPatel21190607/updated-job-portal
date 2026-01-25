@@ -41,6 +41,8 @@ export interface User {
     github?: string;
     portfolio?: string;
     twitter?: string;
+    facebook?: string;
+    instagram?: string;
   };
   preferences?: {
     desiredRole?: string;

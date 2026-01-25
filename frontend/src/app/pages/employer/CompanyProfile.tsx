@@ -182,7 +182,7 @@ export function CompanyProfile() {
                 name="founded"
                 type="number" 
                 defaultValue={profile?.companyDetails?.founded}
-                placeholder="2015" 
+                
               />
             </div>
           </div>
@@ -231,7 +231,7 @@ export function CompanyProfile() {
               id="headquarters" 
               name="headquarters"
               defaultValue={profile?.companyDetails?.headquarters}
-              placeholder="San Francisco, CA" 
+             
             />
           </div>
           <div className="space-y-2">
@@ -240,7 +240,7 @@ export function CompanyProfile() {
               id="otherLocations" 
               name="otherLocations"
               defaultValue={profile?.companyDetails?.otherLocations?.join(', ')}
-              placeholder="New York, NY; Austin, TX" 
+             
             />
           </div>
         </CardContent>

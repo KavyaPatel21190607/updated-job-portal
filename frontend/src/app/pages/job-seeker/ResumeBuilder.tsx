@@ -276,7 +276,7 @@ export function ResumeBuilder() {
               <Label htmlFor="phone">Phone *</Label>
               <Input 
                 id="phone" 
-                placeholder="+1 (555) 123-4567" 
+                placeholder="Enter your phone number" 
                 value={resumeData.phone}
                 onChange={(e) => setResumeData({ ...resumeData, phone: e.target.value })}
               />
@@ -397,7 +397,7 @@ export function ResumeBuilder() {
                 <div className="space-y-2">
                   <Label>Degree</Label>
                   <Input 
-                    placeholder="Bachelor of Science" 
+                    
                     value={edu.degree}
                     onChange={(e) => updateEducation(index, 'degree', e.target.value)}
                   />
@@ -405,7 +405,7 @@ export function ResumeBuilder() {
                 <div className="space-y-2">
                   <Label>Field of Study</Label>
                   <Input 
-                    placeholder="Computer Science" 
+                    
                     value={edu.field}
                     onChange={(e) => updateEducation(index, 'field', e.target.value)}
                   />
@@ -424,7 +424,7 @@ export function ResumeBuilder() {
                   <Label>Graduation Year</Label>
                   <Input 
                     type="number" 
-                    placeholder="2020"
+                    
                     value={edu.year}
                     onChange={(e) => updateEducation(index, 'year', e.target.value)}
                   />
