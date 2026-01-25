@@ -105,7 +105,7 @@ export function CreateJobDialog({ open, onOpenChange, onSuccess, editJob }: Crea
                 id="location" 
                 name="location"
                 defaultValue={editJob?.location}
-                placeholder="e.g. San Francisco, CA" 
+                
                 required 
               />
             </div>
@@ -157,7 +157,7 @@ export function CreateJobDialog({ open, onOpenChange, onSuccess, editJob }: Crea
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="salaryMin">Min Salary (USD) *</Label>
+              <Label htmlFor="salaryMin">Min Salary*</Label>
               <Input 
                 id="salaryMin" 
                 name="salaryMin"
@@ -168,7 +168,7 @@ export function CreateJobDialog({ open, onOpenChange, onSuccess, editJob }: Crea
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="salaryMax">Max Salary (USD) *</Label>
+              <Label htmlFor="salaryMax">Max Salary*</Label>
               <Input 
                 id="salaryMax" 
                 name="salaryMax"
