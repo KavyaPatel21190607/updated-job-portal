@@ -52,72 +52,112 @@ export function MyApplications() {
   };
 
   const handleViewApplication = (application: Application) => {
+    if (!application.job) return;
     // Navigate to job details page or show application details
     navigate(`/job-seeker/jobs/${application.job._id}`);
   };
 
   const handleMessage = (application: Application) => {
+    if (!application.job) return;
     // Navigate to messages with the employer
     navigate(`/job-seeker/messages?user=${application.job.employer}`);
   };
 
-  const ApplicationCard = ({ app }: { app: Application }) => (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg mb-1">{app.job.title}</CardTitle>
-            <p className="text-gray-600">{app.job.companyName}</p>
+  const ApplicationCard = ({ app }: { app: Application }) => {
+    if (!app.job) {
+      return (
+        <Card className="hover:shadow-lg transition-shadow border-red-200 bg-red-50">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle className="text-lg mb-1 text-red-600">Job No Longer Available</CardTitle>
+                <p className="text-gray-600">This job posting has been removed</p>
+              </div>
+              <Badge className={statusConfig[app.status as keyof typeof statusConfig].color}>
+                {statusConfig[app.status as keyof typeof statusConfig].label}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <p className="text-sm text-gray-500">Applied Date</p>
+                <p className="font-medium">
+                  {app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">ATS Score</p>
+                <p className="font-medium">
+                  <span className={app.atsScore >= 80 ? 'text-green-600' : app.atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}>
+                    {app.atsScore}/100
+                  </span>
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <Card className="hover:shadow-lg transition-shadow">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="text-lg mb-1">{app.job.title}</CardTitle>
+              <p className="text-gray-600">{app.job.companyName}</p>
+            </div>
+            <Badge className={statusConfig[app.status as keyof typeof statusConfig].color}>
+              {statusConfig[app.status as keyof typeof statusConfig].label}
+            </Badge>
           </div>
-          <Badge className={statusConfig[app.status as keyof typeof statusConfig].color}>
-            {statusConfig[app.status as keyof typeof statusConfig].label}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <p className="text-sm text-gray-500">Applied Date</p>
-            <p className="font-medium">
-              {new Date(app.appliedAt).toLocaleDateString()}
-            </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p className="text-sm text-gray-500">Applied Date</p>
+              <p className="font-medium">
+                {app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'N/A'}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">ATS Score</p>
+              <p className="font-medium">
+                <span className={app.atsScore >= 80 ? 'text-green-600' : app.atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}>
+                  {app.atsScore}/100
+                </span>
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">ATS Score</p>
-            <p className="font-medium">
-              <span className={app.atsScore >= 80 ? 'text-green-600' : app.atsScore >= 60 ? 'text-yellow-600' : 'text-red-600'}>
-                {app.atsScore}/100
-              </span>
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => handleViewApplication(app)}
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            View Application
-          </Button>
-          {app.status === 'interview' && (
-            <Button variant="outline" size="sm">
-              <Calendar className="w-4 h-4 mr-2" />
-              Schedule
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleViewApplication(app)}
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              View Application
             </Button>
-          )}
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => handleMessage(app)}
-          >
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Message
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+            {app.status === 'interview' && (
+              <Button variant="outline" size="sm">
+                <Calendar className="w-4 h-4 mr-2" />
+                Schedule
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleMessage(app)}
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Message
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="space-y-6">

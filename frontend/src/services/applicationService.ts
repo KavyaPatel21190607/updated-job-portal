@@ -2,7 +2,7 @@ import api from './api';
 
 export interface Application {
   _id: string;
-  job: {
+  job?: {
     _id: string;
     title: string;
     companyName: string;

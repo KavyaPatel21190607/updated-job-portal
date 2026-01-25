@@ -246,6 +246,9 @@ const deleteJob = async (req, res, next) => {
       return errorResponse(res, 403, 'You can only delete your own job postings');
     }
 
+    // Delete associated applications
+    await Application.deleteMany({ job: req.params.id });
+
     await job.deleteOne();
 
     return successResponse(res, 200, 'Job deleted successfully');
