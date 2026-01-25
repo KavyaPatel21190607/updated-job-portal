@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
 import { Button } from '@/app/components/ui/button';
@@ -19,6 +20,7 @@ const statusConfig = {
 };
 
 export function MyApplications() {
+  const navigate = useNavigate();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -47,6 +49,16 @@ export function MyApplications() {
       return applications.filter(app => app.status === 'accepted' || app.status === 'hired');
     }
     return applications.filter(app => app.status === status);
+  };
+
+  const handleViewApplication = (application: Application) => {
+    // Navigate to job details page or show application details
+    navigate(`/job-seeker/jobs/${application.job._id}`);
+  };
+
+  const handleMessage = (application: Application) => {
+    // Navigate to messages with the employer
+    navigate(`/job-seeker/messages?user=${application.job.employer}`);
   };
 
   const ApplicationCard = ({ app }: { app: Application }) => (
@@ -80,7 +92,11 @@ export function MyApplications() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => handleViewApplication(app)}
+          >
             <FileText className="w-4 h-4 mr-2" />
             View Application
           </Button>
@@ -90,7 +106,11 @@ export function MyApplications() {
               Schedule
             </Button>
           )}
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => handleMessage(app)}
+          >
             <MessageSquare className="w-4 h-4 mr-2" />
             Message
           </Button>

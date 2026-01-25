@@ -177,7 +177,7 @@ const userSchema = new mongoose.Schema(
 
 // Indexes for performance
 // Note: email index is automatically created by unique: true
-userSchema.index({ googleId: 1 }, { sparse: true });
+// Note: googleId index is automatically created by sparse: true
 userSchema.index({ role: 1 });
 
 /**

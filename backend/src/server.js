@@ -46,8 +46,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Serve static files (uploaded files)
-app.use('/uploads', express.static('uploads'));
+// Serve static files (uploaded files) - commented out as files are now stored in Supabase
+// app.use('/uploads', express.static('uploads'));
 
 // Health check route
 app.get('/health', (req, res) => {

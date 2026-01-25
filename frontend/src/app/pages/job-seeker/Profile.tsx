@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
@@ -15,7 +15,11 @@ export function JobSeekerProfile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [error, setError] = useState('');
+
+  // Refs for file inputs
+  const profilePictureInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchProfile();
@@ -58,6 +62,10 @@ export function JobSeekerProfile() {
       
       await userService.updateProfile(updates);
       
+      if (profilePictureFile) {
+        await userService.uploadProfilePicture(profilePictureFile);
+      }
+      
       if (resumeFile) {
         await userService.uploadResume(resumeFile);
       }
@@ -75,6 +83,16 @@ export function JobSeekerProfile() {
     if (e.target.files && e.target.files[0]) {
       setResumeFile(e.target.files[0]);
     }
+  };
+
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfilePictureFile(e.target.files[0]);
+    }
+  };
+
+  const handleProfilePictureUpload = () => {
+    profilePictureInputRef.current?.click();
   };
 
   if (loading) {
@@ -107,18 +125,34 @@ export function JobSeekerProfile() {
         <CardContent>
           <div className="flex items-center gap-6 mb-6">
             <Avatar className="w-24 h-24">
-              <AvatarFallback className="bg-blue-100 text-blue-600 text-2xl">
-                {user?.name?.charAt(0)}
-              </AvatarFallback>
+              {profile?.profilePicture ? (
+                <img src={profile.profilePicture} alt="Profile" className="w-full h-full object-cover rounded-full" />
+              ) : (
+                <AvatarFallback className="bg-blue-100 text-blue-600 text-2xl">
+                  {user?.name?.charAt(0)}
+                </AvatarFallback>
+              )}
             </Avatar>
             <div>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" onClick={handleProfilePictureUpload}>
                 <Upload className="w-4 h-4 mr-2" />
                 Upload Photo
               </Button>
+              <input
+                ref={profilePictureInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+                className="hidden"
+              />
               <p className="text-sm text-gray-500 mt-2">
-                JPG, PNG or GIF. Max size 2MB
+                JPG, PNG or GIF. Max size 5MB
               </p>
+              {profilePictureFile && (
+                <p className="text-sm text-green-600 mt-1">
+                  Selected: {profilePictureFile.name}
+                </p>
+              )}
             </div>
           </div>
           <div className="space-y-2">
@@ -236,7 +270,7 @@ export function JobSeekerProfile() {
                 id="expectedSalary" 
                 name="expectedSalary"
                 defaultValue={profile?.preferences?.expectedSalary}
-                placeholder="$120,000 - $150,000" 
+                placeholder="Enter Your Expected Salary" 
               />
             </div>
           </div>
@@ -246,7 +280,7 @@ export function JobSeekerProfile() {
               id="preferredLocations" 
               name="preferredLocations"
               defaultValue={profile?.preferences?.preferredLocations?.join(', ')}
-              placeholder="San Francisco, Remote" 
+              placeholder="Enter Preferred Locations" 
             />
           </div>
         </CardContent>

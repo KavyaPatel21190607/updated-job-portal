@@ -64,6 +64,18 @@ const updateProfile = async (req, res, next) => {
  */
 const uploadProfilePicture = async (req, res, next) => {
   try {
+    console.log('📸 Upload profile picture request received');
+    console.log('File object:', req.file ? 'EXISTS' : 'MISSING');
+    if (req.file) {
+      console.log('File details:', {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        supabaseUrl: req.file.supabaseUrl,
+        fileName: req.file.fileName
+      });
+    }
+
     if (!req.file) {
       return errorResponse(res, 400, 'Please upload an image file');
     }
@@ -72,17 +84,24 @@ const uploadProfilePicture = async (req, res, next) => {
 
     // Delete old profile picture if exists
     if (user.profilePicture) {
-      deleteFile(user.profilePicture);
+      // Extract file path from Supabase URL for deletion
+      const urlParts = user.profilePicture.split('/storage/v1/object/public/')[1];
+      if (urlParts) {
+        await deleteFile(urlParts);
+      }
     }
 
-    // Update profile picture path
-    user.profilePicture = `/uploads/${req.file.filename}`;
+    // Update profile picture URL
+    user.profilePicture = req.file.supabaseUrl;
     await user.save();
+
+    console.log('✅ Profile picture updated in database:', user.profilePicture);
 
     return successResponse(res, 200, 'Profile picture uploaded successfully', {
       profilePicture: user.profilePicture,
     });
   } catch (error) {
+    console.error('❌ Profile picture upload error:', error);
     next(error);
   }
 };
@@ -94,6 +113,18 @@ const uploadProfilePicture = async (req, res, next) => {
  */
 const uploadResume = async (req, res, next) => {
   try {
+    console.log('📄 Upload resume request received');
+    console.log('File object:', req.file ? 'EXISTS' : 'MISSING');
+    if (req.file) {
+      console.log('File details:', {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        supabaseUrl: req.file.supabaseUrl,
+        fileName: req.file.fileName
+      });
+    }
+
     if (!req.file) {
       return errorResponse(res, 400, 'Please upload a resume file (PDF or Word)');
     }
@@ -102,23 +133,30 @@ const uploadResume = async (req, res, next) => {
 
     // Delete old resume if exists
     if (user.resume && user.resume.path) {
-      deleteFile(user.resume.path);
+      // Extract file path from Supabase URL for deletion
+      const urlParts = user.resume.path.split('/storage/v1/object/public/')[1];
+      if (urlParts) {
+        await deleteFile(urlParts);
+      }
     }
 
     // Update resume
     user.resume = {
       filename: req.file.originalname,
-      path: `/uploads/${req.file.filename}`,
+      path: req.file.supabaseUrl,
       uploadedAt: new Date(),
     };
 
     user.calculateProfileCompletion();
     await user.save();
 
+    console.log('✅ Resume updated in database:', user.resume);
+
     return successResponse(res, 200, 'Resume uploaded successfully', {
       resume: user.resume,
     });
   } catch (error) {
+    console.error('❌ Resume upload error:', error);
     next(error);
   }
 };
@@ -138,11 +176,15 @@ const uploadCompanyLogo = async (req, res, next) => {
 
     // Delete old logo if exists
     if (user.companyLogo) {
-      deleteFile(user.companyLogo);
+      // Extract file path from Supabase URL for deletion
+      const urlParts = user.companyLogo.split('/storage/v1/object/public/')[1];
+      if (urlParts) {
+        await deleteFile(urlParts);
+      }
     }
 
     // Update company logo
-    user.companyLogo = `/uploads/${req.file.filename}`;
+    user.companyLogo = req.file.supabaseUrl;
     await user.save();
 
     return successResponse(res, 200, 'Company logo uploaded successfully', {

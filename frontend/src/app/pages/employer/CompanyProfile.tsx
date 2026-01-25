@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
@@ -14,6 +14,11 @@ export function CompanyProfile() {
   const [profile, setProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [companyLogoFile, setCompanyLogoFile] = useState<File | null>(null);
+  const [error, setError] = useState('');
+
+  // Ref for file input
+  const companyLogoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchProfile();
@@ -56,6 +61,11 @@ export function CompanyProfile() {
       };
       
       await userService.updateProfile(updates);
+      
+      if (companyLogoFile) {
+        await userService.uploadCompanyLogo(companyLogoFile);
+      }
+      
       alert('Company profile updated successfully!');
       fetchProfile();
     } catch (err: any) {
@@ -63,6 +73,16 @@ export function CompanyProfile() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCompanyLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCompanyLogoFile(e.target.files[0]);
+    }
+  };
+
+  const handleCompanyLogoUpload = () => {
+    companyLogoInputRef.current?.click();
   };
 
   if (loading) {
@@ -88,18 +108,34 @@ export function CompanyProfile() {
         <CardContent>
           <div className="flex items-center gap-6">
             <Avatar className="w-24 h-24">
-              <AvatarFallback className="bg-purple-100 text-purple-600 text-2xl">
-                {user?.name?.charAt(0)}
-              </AvatarFallback>
+              {profile?.companyLogo ? (
+                <img src={profile.companyLogo} alt="Company Logo" className="w-full h-full object-cover rounded-full" />
+              ) : (
+                <AvatarFallback className="bg-purple-100 text-purple-600 text-2xl">
+                  {user?.name?.charAt(0)}
+                </AvatarFallback>
+              )}
             </Avatar>
             <div>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" onClick={handleCompanyLogoUpload}>
                 <Upload className="w-4 h-4 mr-2" />
                 Upload Logo
               </Button>
+              <input
+                ref={companyLogoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleCompanyLogoChange}
+                className="hidden"
+              />
               <p className="text-sm text-gray-500 mt-2">
-                JPG, PNG or SVG. Max size 2MB
+                JPG, PNG or GIF. Max size 5MB
               </p>
+              {companyLogoFile && (
+                <p className="text-sm text-green-600 mt-1">
+                  Selected: {companyLogoFile.name}
+                </p>
+              )}
             </div>
           </div>
         </CardContent>

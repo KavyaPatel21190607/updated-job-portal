@@ -92,7 +92,13 @@ export function Applicants() {
 
   const handleDownloadResume = (resume: any) => {
     if (resume?.path) {
-      window.open(`http://localhost:5000${resume.path}`, '_blank');
+      // Check if it's already a full URL (Supabase URL)
+      if (resume.path.startsWith('http')) {
+        window.open(resume.path, '_blank');
+      } else {
+        // Legacy local path
+        window.open(`http://localhost:5000${resume.path}`, '_blank');
+      }
     } else {
       alert('No resume available');
     }

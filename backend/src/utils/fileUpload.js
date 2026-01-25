@@ -1,27 +1,157 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const { createClient } = require('@supabase/supabase-js');
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const bucketName = process.env.SUPABASE_STORAGE_BUCKET || 'job-portal-files';
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Supabase configuration is not set');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseAdmin = supabaseServiceRoleKey ? createClient(supabaseUrl, supabaseServiceRoleKey) : supabase;
+
+// Use admin client for uploads to bypass RLS policies
+const supabaseUpload = supabaseAdmin;
+
+// Initialize bucket if it doesn't exist
+const initializeBucket = async () => {
+  try {
+    const { data, error } = await supabaseAdmin.storage.getBucket(bucketName);
+    if (error && error.message.includes('not found')) {
+      // Create bucket if it doesn't exist
+      const { error: createError } = await supabaseAdmin.storage.createBucket(bucketName, {
+        public: true,
+        allowedMimeTypes: ['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+        fileSizeLimit: 5242880, // 5MB
+      });
+      if (createError) {
+        console.error('❌ Error creating bucket:', createError);
+      } else {
+        console.log(`✅ Created Supabase bucket: ${bucketName}`);
+      }
+    } else if (error) {
+      console.error('❌ Error checking bucket:', error);
+    } else {
+      console.log(`✅ Supabase bucket exists: ${bucketName}`);
+      // Ensure bucket is public
+      if (!data.public) {
+        console.log('🔧 Making bucket public...');
+        const { error: updateError } = await supabaseAdmin.storage.updateBucket(bucketName, {
+          public: true
+        });
+        if (updateError) {
+          console.error('❌ Error making bucket public:', updateError);
+        } else {
+          console.log('✅ Bucket is now public');
+        }
+      }
+    }
+  } catch (err) {
+    console.error('❌ Error initializing bucket:', err);
+  }
+};
+
+// Initialize bucket on startup
+initializeBucket();
+
+/**
+ * Custom multer storage for Supabase Storage
+ */
+class SupabaseStorage {
+  constructor(options = {}) {
+    this.bucketName = options.bucketName || bucketName;
+    this.getFileName = options.getFileName || this._getFileName;
+  }
+
+  _getFileName(req, file) {
+    // Generate unique filename: userId/fieldname/timestamp_random_originalname
+    const userId = req.user?.id || 'anonymous';
+    const timestamp = Date.now();
+    const random = Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    const name = path.basename(file.originalname, ext).replace(/\s+/g, '-');
+    return `${userId}/${file.fieldname}/${timestamp}-${random}-${name}${ext}`;
+  }
+
+  _handleFile(req, file, cb) {
+    const fileName = this.getFileName(req, file);
+
+    console.log(`📤 Starting upload: ${fileName} (${file.size || 'unknown'} bytes, ${file.mimetype})`);
+    console.log(`👤 User: ${req.user?.id || 'anonymous'}`);
+
+    // For multer custom storage, we need to read the stream into a buffer
+    const chunks = [];
+    let fileSize = 0;
+
+    file.stream.on('data', (chunk) => {
+      chunks.push(chunk);
+      fileSize += chunk.length;
+    });
+
+    file.stream.on('end', async () => {
+      const buffer = Buffer.concat(chunks);
+      console.log(`📊 File buffer size: ${buffer.length} bytes`);
+
+      try {
+        // Upload to Supabase Storage using admin client (bypasses RLS)
+        const { data, error } = await supabaseUpload.storage
+          .from(this.bucketName)
+          .upload(fileName, buffer, {
+            contentType: file.mimetype,
+            upsert: false, // Don't overwrite existing files
+          });
+
+        if (error) {
+          console.error('❌ Supabase upload error:', error);
+          console.error('Error details:', JSON.stringify(error, null, 2));
+          return cb(new Error(`Upload failed: ${error.message}`));
+        }
+
+        console.log('✅ File uploaded successfully:', data?.path);
+
+        // Get public URL using regular client
+        const { data: urlData } = supabase.storage
+          .from(this.bucketName)
+          .getPublicUrl(fileName);
+
+        console.log('🔗 Public URL generated:', urlData.publicUrl);
+
+        file.supabaseUrl = urlData.publicUrl;
+        file.fileName = fileName;
+        cb(null, {
+          filename: fileName,
+          path: urlData.publicUrl,
+          size: fileSize,
+        });
+      } catch (error) {
+        console.error('❌ Unexpected upload error:', error);
+        console.error('Error details:', error.message);
+        cb(new Error(`Unexpected upload error: ${error.message}`));
+      }
+    });
+
+    file.stream.on('error', (error) => {
+      console.error('❌ File stream error:', error);
+      cb(new Error(`File stream error: ${error.message}`));
+    });
+  }
+
+  _removeFile(req, file, cb) {
+    // Optional: implement file removal if needed
+    cb(null);
+  }
 }
 
 /**
  * Configure storage for uploaded files
  */
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename: userId_timestamp_originalname
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname, ext).replace(/\s+/g, '-');
-    cb(null, `${req.user?.id || 'user'}_${uniqueSuffix}_${name}${ext}`);
-  },
+const storage = new SupabaseStorage({
+  bucketName: bucketName,
 });
 
 /**
@@ -66,18 +196,22 @@ const upload = multer({
 });
 
 /**
- * Delete file from uploads directory
+ * Delete file from Supabase Storage
  */
-const deleteFile = (filePath) => {
+const deleteFile = async (fileName) => {
   try {
-    const fullPath = path.join(__dirname, '../../', filePath);
-    if (fs.existsSync(fullPath)) {
-      fs.unlinkSync(fullPath);
-      return true;
+    const { data, error } = await supabaseAdmin.storage
+      .from(bucketName)
+      .remove([fileName]);
+
+    if (error) {
+      console.error('Error deleting file from Supabase:', error);
+      return false;
     }
-    return false;
+
+    return true;
   } catch (error) {
-    console.error('Error deleting file:', error);
+    console.error('Error deleting file from Supabase:', error);
     return false;
   }
 };
