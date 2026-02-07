@@ -226,8 +226,7 @@ File: `backend/.env`
 PORT=5000
 NODE_ENV=development
 
-# MongoDB (Already configured with your credentials)
-MONGO_URI=mongodb+srv://ku2407u661_db_user:QRIqFxXnFMNgsVj3@cluster0.xmyi9hz.mongodb.net/job-portal?retryWrites=true&w=majority
+
 
 # JWT (Change in production!)
 JWT_SECRET=your_super_secret_jwt_key_change_this_in_production_2024
