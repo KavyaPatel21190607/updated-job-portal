@@ -112,7 +112,7 @@ All mock data has been successfully removed from the frontend and replaced with 
 ### Environment Variables (.env)
 ```env
 PORT=5000
-MONGODB_URI=mongodb+srv://ku2407u661_db_user:QRIqFxXnFMNgsVj3@cluster0.xmyi9hz.mongodb.net/job-portal
+
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_REFRESH_SECRET=your-super-secret-refresh-key-change-in-production
 JWT_EXPIRES_IN=1h
